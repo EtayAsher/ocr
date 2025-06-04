@@ -158,27 +158,22 @@
       output.textContent = 'Processing...';
       output.classList.remove('rtl');
 
-      Tesseract.createWorker()
-        .then(worker => {
-          return worker.load().then(() =>
-            worker.loadLanguage(lang).then(() =>
-              worker.initialize(lang).then(() =>
-                worker.recognize(file).then(result => {
-                  let text = result.data.text.trim();
-                  output.textContent = text || 'No readable text found.';
-                  if (['heb', 'ara'].includes(lang)) {
-                    output.classList.add('rtl');
-                  }
-                  return worker.terminate();
-                })
-              )
-            )
-          );
-        })
-        .catch(err => {
-          output.textContent = 'Error loading OCR engine.';
-          console.error(err);
-        });
+      Tesseract.recognize(
+        file,
+        lang,
+        {
+          logger: m => console.log(m)
+        }
+      ).then(({ data: { text } }) => {
+        const cleanText = text.trim() || 'No readable text found.';
+        output.textContent = cleanText;
+        if (["heb", "ara"].includes(lang)) {
+          output.classList.add("rtl");
+        }
+      }).catch(err => {
+        output.textContent = 'Error during conversion. Please try again.';
+        console.error(err);
+      });
     }
   </script>
 </body>
