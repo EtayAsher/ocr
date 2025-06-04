@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI OCR – Convert Image to Text</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
@@ -118,7 +118,7 @@
         <option value="nld">Dutch</option>
         <option value="ron">Romanian</option>
       </select>
-      <input type="file" id="imageInput" accept="image/*">
+      <input type="file" id="imageInput" accept="image/*" onchange="previewImage()">
       <button onclick="convertImageToText()">Convert Image to Text</button>
       <img id="preview" src="" style="display:none" />
     </div>
@@ -138,30 +138,37 @@
   </footer>
 
   <script>
+    function previewImage() {
+      const file = document.getElementById('imageInput').files[0];
+      const preview = document.getElementById('preview');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
     function convertImageToText() {
       const file = document.getElementById('imageInput').files[0];
       const lang = document.getElementById('langSelect').value;
       const output = document.getElementById('output');
-      const preview = document.getElementById('preview');
-
       if (!file) {
         alert('Please choose an image.');
         return;
       }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        preview.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-
       output.textContent = 'Processing...';
       output.classList.remove('rtl');
 
-      Tesseract.recognize(file, lang, {
-        logger: m => console.log(m)
-      }).then(({ data: { text } }) => {
+      Tesseract.recognize(
+        file,
+        lang,
+        {
+          logger: m => console.log(m)
+        }
+      ).then(({ data: { text } }) => {
         const cleanText = text.trim() || 'No readable text found.';
         output.textContent = cleanText;
         if (["heb", "ara"].includes(lang)) {
@@ -180,7 +187,7 @@
     }
 
     function downloadPDF() {
-      const {{ jsPDF }} = window.jspdf;
+      const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       const text = document.getElementById('output').textContent;
       const lines = doc.splitTextToSize(text, 180);
