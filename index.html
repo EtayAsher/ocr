@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AI OCR - Image to Text in Any Language</title>
-  <meta name="description" content="Convert images to text in multiple languages including Hebrew, English, Arabic, Russian, Chinese, and more. Free, fast and accurate OCR online." />
+  <meta name="description" content="Convert images to text in multiple languages with accurate OCR. Free, fast and multilingual." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <style>
@@ -81,6 +81,10 @@
       color: #2b4c7e;
       margin-bottom: 10px;
     }
+    .rtl {
+      direction: rtl;
+      text-align: right;
+    }
   </style>
 </head>
 <body>
@@ -108,7 +112,6 @@
         <option value="pol">Polish</option>
         <option value="nld">Dutch</option>
         <option value="ron">Romanian</option>
-        <option value="enm">Canadian English</option>
       </select>
 
       <input type="file" id="imageInput" accept="image/*">
@@ -117,17 +120,17 @@
 
     <div class="card">
       <div class="feature-title">What is OCR?</div>
-      OCR (Optical Character Recognition) is a technology that reads text from images and scanned documents, making it editable.
+      OCR (Optical Character Recognition) reads text from images and scanned documents, making them editable.
     </div>
 
     <div class="card">
       <div class="feature-title">Tips for Better Results</div>
-      Make sure your image is clear, with readable text. Use high contrast and avoid shadows.
+      Upload clear images with readable text. Avoid blurry or shadowed photos.
     </div>
 
     <div class="card">
       <div class="feature-title">Free & Secure</div>
-      All processing is done in your browser. No files are uploaded or stored.
+      All processing is done in your browser. No images are uploaded.
     </div>
   </div>
 
@@ -145,23 +148,37 @@
     function convertImageToText() {
       const file = document.getElementById('imageInput').files[0];
       const lang = document.getElementById('langSelect').value;
+      const output = document.getElementById('output');
+
       if (!file) {
         alert('Please choose an image first.');
         return;
       }
-      document.getElementById('output').textContent = 'Processing...';
-      Tesseract.recognize(
-        file,
-        lang,
-        {
-          logger: m => console.log(m)
-        }
-      ).then(({ data: { text } }) => {
-        document.getElementById('output').textContent = text;
-      }).catch(err => {
-        document.getElementById('output').textContent = 'Error during conversion. Try another image.';
-        console.error(err);
-      });
+
+      output.textContent = 'Processing...';
+      output.classList.remove('rtl');
+
+      Tesseract.createWorker()
+        .then(worker => {
+          return worker.load().then(() =>
+            worker.loadLanguage(lang).then(() =>
+              worker.initialize(lang).then(() =>
+                worker.recognize(file).then(result => {
+                  let text = result.data.text.trim();
+                  output.textContent = text || 'No readable text found.';
+                  if (['heb', 'ara'].includes(lang)) {
+                    output.classList.add('rtl');
+                  }
+                  return worker.terminate();
+                })
+              )
+            )
+          );
+        })
+        .catch(err => {
+          output.textContent = 'Error loading OCR engine.';
+          console.error(err);
+        });
     }
   </script>
 </body>
