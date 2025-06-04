@@ -3,83 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AI OCR - Image to Text in Any Language</title>
-  <meta name="description" content="Convert images to text in multiple languages with accurate OCR. Free, fast and multilingual." />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>AI OCR – Convert Image to Text</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(to right, #e8f0ff, #ffffff);
+      background: #f5f7fa;
       color: #222;
     }
     header {
-      text-align: center;
-      padding: 50px 20px 20px;
       background: #2b4c7e;
       color: white;
+      text-align: center;
+      padding: 40px 20px 20px;
     }
     header h1 {
-      margin: 0;
-      font-size: 2.8rem;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
     }
     .container {
-      max-width: 1000px;
-      margin: 30px auto;
-      padding: 20px;
       display: flex;
       flex-wrap: wrap;
-      gap: 20px;
       justify-content: center;
+      gap: 20px;
+      max-width: 1300px;
+      margin: 40px auto;
+      padding: 20px;
     }
-    .card, .upload-box {
-      background: #fff;
+    .upload-section, .preview-section {
+      background: white;
+      padding: 20px;
       border-radius: 16px;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-      padding: 30px;
-      flex: 1 1 300px;
-      min-width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      flex: 1 1 400px;
     }
-    .upload-box input[type="file"], select, button {
-      display: block;
+    .upload-section input, select, button {
       width: 100%;
-      margin-bottom: 20px;
-      font-size: 1rem;
-    }
-    select, button {
+      margin-bottom: 15px;
       padding: 10px;
-      border: 1px solid #ccc;
+      font-size: 1rem;
       border-radius: 8px;
+      border: 1px solid #ccc;
     }
-    button {
-      background-color: #2b4c7e;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button:hover {
-      background-color: #1f365a;
+    .preview-section img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
     }
     #output {
       white-space: pre-wrap;
       background: #f9f9f9;
-      border-radius: 12px;
+      border-radius: 10px;
       padding: 20px;
-      font-size: 1rem;
       border: 1px solid #ddd;
+      min-height: 300px;
+      overflow-y: auto;
+    }
+    .tools {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .tools button {
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      border: none;
+      background: #2b4c7e;
+      color: white;
+      cursor: pointer;
+    }
+    .tools button:hover {
+      background: #1f365a;
     }
     footer {
       text-align: center;
-      margin: 50px 20px 20px;
+      padding: 30px;
       font-size: 0.9rem;
-      color: #555;
-    }
-    .feature-title {
-      font-weight: bold;
-      color: #2b4c7e;
-      margin-bottom: 10px;
+      color: #666;
     }
     .rtl {
       direction: rtl;
@@ -90,12 +95,12 @@
 <body>
   <header>
     <h1>AI OCR – Convert Image to Text</h1>
-    <p style="margin-top: 10px; font-size: 1.1rem; font-weight: 300;">Supports Hebrew, English, Arabic, Chinese, Russian, and more</p>
+    <p>Supports Hebrew, English, Arabic, Chinese, Russian, and more</p>
   </header>
 
   <div class="container">
-    <div class="upload-box">
-      <label for="langSelect">Choose Language:</label>
+    <div class="upload-section">
+      <label>Select Language:</label>
       <select id="langSelect">
         <option value="heb">Hebrew</option>
         <option value="eng">English</option>
@@ -113,35 +118,23 @@
         <option value="nld">Dutch</option>
         <option value="ron">Romanian</option>
       </select>
-
       <input type="file" id="imageInput" accept="image/*">
-      <button onclick="convertImageToText()">Convert</button>
+      <button onclick="convertImageToText()">Convert Image to Text</button>
+      <img id="preview" src="" style="display:none" />
     </div>
 
-    <div class="card">
-      <div class="feature-title">What is OCR?</div>
-      OCR (Optical Character Recognition) reads text from images and scanned documents, making them editable.
-    </div>
-
-    <div class="card">
-      <div class="feature-title">Tips for Better Results</div>
-      Upload clear images with readable text. Avoid blurry or shadowed photos.
-    </div>
-
-    <div class="card">
-      <div class="feature-title">Free & Secure</div>
-      All processing is done in your browser. No images are uploaded.
-    </div>
-  </div>
-
-  <div class="container">
-    <div class="card" style="flex-basis: 100%;">
+    <div class="preview-section">
+      <div class="tools">
+        <button onclick="copyText()">Copy</button>
+        <button onclick="downloadPDF()">Download PDF</button>
+        <button onclick="downloadTXT()">Download TXT</button>
+      </div>
       <div id="output">Converted text will appear here...</div>
     </div>
   </div>
 
   <footer>
-    AI OCR Tool – Powered by Tesseract.js | Free & Private | Designed for global users
+    AI OCR Tool – Built with Tesseract.js | Fast, Free, and Multilingual OCR Online
   </footer>
 
   <script>
@@ -149,31 +142,61 @@
       const file = document.getElementById('imageInput').files[0];
       const lang = document.getElementById('langSelect').value;
       const output = document.getElementById('output');
+      const preview = document.getElementById('preview');
 
       if (!file) {
-        alert('Please choose an image first.');
+        alert('Please choose an image.');
         return;
       }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
 
       output.textContent = 'Processing...';
       output.classList.remove('rtl');
 
-      Tesseract.recognize(
-        file,
-        lang,
-        {
-          logger: m => console.log(m)
-        }
-      ).then(({ data: { text } }) => {
+      Tesseract.recognize(file, lang, {
+        logger: m => console.log(m)
+      }).then(({ data: { text } }) => {
         const cleanText = text.trim() || 'No readable text found.';
         output.textContent = cleanText;
         if (["heb", "ara"].includes(lang)) {
           output.classList.add("rtl");
         }
       }).catch(err => {
-        output.textContent = 'Error during conversion. Please try again.';
+        output.textContent = 'Error processing image.';
         console.error(err);
       });
+    }
+
+    function copyText() {
+      const output = document.getElementById('output').textContent;
+      navigator.clipboard.writeText(output);
+      alert('Text copied to clipboard!');
+    }
+
+    function downloadPDF() {
+      const {{ jsPDF }} = window.jspdf;
+      const doc = new jsPDF();
+      const text = document.getElementById('output').textContent;
+      const lines = doc.splitTextToSize(text, 180);
+      doc.text(lines, 10, 10);
+      doc.save('ocr_result.pdf');
+    }
+
+    function downloadTXT() {
+      const text = document.getElementById('output').textContent;
+      const blob = new Blob([text], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'ocr_result.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
   </script>
 </body>
