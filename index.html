@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>המרת תמונה לטקסט בעברית</title>
+  <meta name="description" content="המר תמונה לטקסט בעברית בקלות ובחינם. העלה קובץ וקבל את הטקסט הסרוק תוך שניות." />
+  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Assistant', sans-serif;
+      background: linear-gradient(135deg, #f0f4f8, #d9e4f5);
+      color: #222;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #2b4c7e;
+    }
+    .uploader {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 0 auto 30px;
+    }
+    input[type="file"] {
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #2b4c7e;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    button:hover {
+      background-color: #1f365a;
+    }
+    #output {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      white-space: pre-wrap;
+      text-align: right;
+      direction: rtl;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    footer {
+      margin-top: 50px;
+      font-size: 0.9rem;
+      color: #777;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+</head>
+<body>
+  <h1>המרת תמונה לטקסט בעברית</h1>
+  <div class="uploader">
+    <input type="file" id="imageInput" accept="image/*" />
+    <br />
+    <button onclick="convertImageToText()">המר</button>
+  </div>
+  <div id="output"></div>
+  <footer>
+    אתר OCR בעברית - בחינם וללא הרשמה | מופעל על ידי Tesseract.js | נבנה באהבה על ידי Etay
+  </footer>
+
+  <script>
+    function convertImageToText() {
+      const file = document.getElementById('imageInput').files[0];
+      if (!file) {
+        alert('אנא בחר קובץ תמונה קודם');
+        return;
+      }
+      document.getElementById('output').textContent = 'טוען וממיר תמונה...';
+      Tesseract.recognize(
+        file,
+        'heb',
+        {
+          logger: m => console.log(m)
+        }
+      ).then(({ data: { text } }) => {
+        document.getElementById('output').textContent = text;
+      }).catch(err => {
+        document.getElementById('output').textContent = 'שגיאה בהמרה. אנא נסה שוב.';
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>
