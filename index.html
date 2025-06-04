@@ -1,97 +1,165 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>המרת תמונה לטקסט בעברית</title>
-  <meta name="description" content="המר תמונה לטקסט בעברית בקלות ובחינם. העלה קובץ וקבל את הטקסט הסרוק תוך שניות." />
-  <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap" rel="stylesheet" />
+  <title>AI OCR - Image to Text in Any Language</title>
+  <meta name="description" content="Convert images to text in multiple languages including Hebrew, English, Arabic, Russian, Chinese, and more. Free, fast and accurate OCR online." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
   <style>
     body {
       margin: 0;
-      font-family: 'Assistant', sans-serif;
-      background: linear-gradient(135deg, #f0f4f8, #d9e4f5);
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #e8f0ff, #ffffff);
       color: #222;
+    }
+    header {
       text-align: center;
-      padding: 40px 20px;
+      padding: 50px 20px 20px;
+      background: #2b4c7e;
+      color: white;
     }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
-      color: #2b4c7e;
+    header h1 {
+      margin: 0;
+      font-size: 2.8rem;
     }
-    .uploader {
-      background: white;
+    .container {
+      max-width: 1000px;
+      margin: 30px auto;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+    .card, .upload-box {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.05);
       padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      max-width: 500px;
-      margin: 0 auto 30px;
+      flex: 1 1 300px;
+      min-width: 300px;
     }
-    input[type="file"] {
+    .upload-box input[type="file"], select, button {
+      display: block;
+      width: 100%;
       margin-bottom: 20px;
+      font-size: 1rem;
+    }
+    select, button {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
     }
     button {
       background-color: #2b4c7e;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 10px;
       cursor: pointer;
-      font-size: 1rem;
+      transition: 0.2s;
     }
     button:hover {
       background-color: #1f365a;
     }
     #output {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
       white-space: pre-wrap;
-      text-align: right;
-      direction: rtl;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      background: #f9f9f9;
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 1rem;
+      border: 1px solid #ddd;
     }
     footer {
-      margin-top: 50px;
+      text-align: center;
+      margin: 50px 20px 20px;
       font-size: 0.9rem;
-      color: #777;
+      color: #555;
+    }
+    .feature-title {
+      font-weight: bold;
+      color: #2b4c7e;
+      margin-bottom: 10px;
     }
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
-  <h1>המרת תמונה לטקסט בעברית</h1>
-  <div class="uploader">
-    <input type="file" id="imageInput" accept="image/*" />
-    <br />
-    <button onclick="convertImageToText()">המר</button>
+  <header>
+    <h1>AI OCR – Convert Image to Text</h1>
+    <p style="margin-top: 10px; font-size: 1.1rem; font-weight: 300;">Supports Hebrew, English, Arabic, Chinese, Russian, and more</p>
+  </header>
+
+  <div class="container">
+    <div class="upload-box">
+      <label for="langSelect">Choose Language:</label>
+      <select id="langSelect">
+        <option value="heb">Hebrew</option>
+        <option value="eng">English</option>
+        <option value="ara">Arabic</option>
+        <option value="rus">Russian</option>
+        <option value="deu">German</option>
+        <option value="fra">French</option>
+        <option value="ita">Italian</option>
+        <option value="spa">Spanish</option>
+        <option value="por">Portuguese</option>
+        <option value="jpn">Japanese</option>
+        <option value="ell">Greek</option>
+        <option value="chi_sim">Chinese (Simplified)</option>
+        <option value="pol">Polish</option>
+        <option value="nld">Dutch</option>
+        <option value="ron">Romanian</option>
+        <option value="enm">Canadian English</option>
+      </select>
+
+      <input type="file" id="imageInput" accept="image/*">
+      <button onclick="convertImageToText()">Convert</button>
+    </div>
+
+    <div class="card">
+      <div class="feature-title">What is OCR?</div>
+      OCR (Optical Character Recognition) is a technology that reads text from images and scanned documents, making it editable.
+    </div>
+
+    <div class="card">
+      <div class="feature-title">Tips for Better Results</div>
+      Make sure your image is clear, with readable text. Use high contrast and avoid shadows.
+    </div>
+
+    <div class="card">
+      <div class="feature-title">Free & Secure</div>
+      All processing is done in your browser. No files are uploaded or stored.
+    </div>
   </div>
-  <div id="output"></div>
+
+  <div class="container">
+    <div class="card" style="flex-basis: 100%;">
+      <div id="output">Converted text will appear here...</div>
+    </div>
+  </div>
+
   <footer>
-    אתר OCR בעברית - בחינם וללא הרשמה | מופעל על ידי Tesseract.js | נבנה באהבה על ידי Etay
+    AI OCR Tool – Powered by Tesseract.js | Free & Private | Designed for global users
   </footer>
 
   <script>
     function convertImageToText() {
       const file = document.getElementById('imageInput').files[0];
+      const lang = document.getElementById('langSelect').value;
       if (!file) {
-        alert('אנא בחר קובץ תמונה קודם');
+        alert('Please choose an image first.');
         return;
       }
-      document.getElementById('output').textContent = 'טוען וממיר תמונה...';
+      document.getElementById('output').textContent = 'Processing...';
       Tesseract.recognize(
         file,
-        'heb',
+        lang,
         {
           logger: m => console.log(m)
         }
       ).then(({ data: { text } }) => {
         document.getElementById('output').textContent = text;
       }).catch(err => {
-        document.getElementById('output').textContent = 'שגיאה בהמרה. אנא נסה שוב.';
+        document.getElementById('output').textContent = 'Error during conversion. Try another image.';
         console.error(err);
       });
     }
